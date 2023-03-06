@@ -1,10 +1,13 @@
 package rafaelsantos.agenda.domain.service;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import rafaelsantos.agenda.domain.entity.Paciente;
 import rafaelsantos.agenda.domain.exception.BusinessException;
+import rafaelsantos.agenda.domain.exception.DatabaseException;
 import rafaelsantos.agenda.domain.repository.PacienteRepository;
 
 import java.util.List;
@@ -45,7 +48,29 @@ public class PacienteService {
 
     }
 
+    public Paciente alterar(Long id, Paciente paciente) {
+        try{Optional<Paciente> optPaciente = this.buscarPorId(id);
+
+        if (optPaciente.isEmpty()) {
+            throw new BusinessException("Paciente não cadastrado!");
+        }
+
+        paciente.setId(id);
+
+        return salvar(paciente);}
+        catch (BusinessException e){
+            throw new BusinessException("Id não encontrado" + id);
+        }
+    }
+
     public void deletar(Long id) {
-        repository.deleteById(id);
+        try {
+            repository.deleteById(id);
+        } catch (EmptyResultDataAccessException e) {
+            throw new BusinessException("Id não encontrado: " + id);
+        }
+        catch (DataIntegrityViolationException e) {
+            throw new DatabaseException("Violação de integridade");
+        }
     }
 }
