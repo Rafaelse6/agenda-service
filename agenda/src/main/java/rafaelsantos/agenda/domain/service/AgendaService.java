@@ -24,7 +24,7 @@ public class AgendaService {
         return repository.findAll();
     }
 
-    public Optional<Agenda> findById(Long id){
+    public Optional<Agenda> buscarPorId(Long id){
         return repository.findById(id);
     }
     public Agenda salvar(Agenda agenda){
